@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import NumberContainer from "../components/game/NumberContainer";
+import PrimaryButton from "../components/Ui/PrimaryButton";
 import Title from "../components/Ui/Title";
 import Colors from "../constants/Colors";
 
@@ -13,15 +14,52 @@ const generateRandomBetween = (min, max, exclude) => {
     return rndNum;
   }
 };
+
+let minBoundary = 1;
+let maxBoundary = 100;
 const GameScreen = ({ userNumber }) => {
-  const initialGuess = generateRandomBetween(1, 100, userNumber);
+  const initialGuess = generateRandomBetween(
+    minBoundary,
+    maxBoundary,
+    userNumber
+  );
   const [currentGuess, setCurrentGuess] = useState(initialGuess);
+  const nextGuessHandler = (direction) => {
+    if (
+      (direction === "lower" && userNumber > currentGuess) ||
+      (direction === "greater" && userNumber < currentGuess)
+    ) {
+      Alert.alert("Don't lie", "You know that this is wrong..", [
+        { text: "Sorry", style: "cancle" },
+      ]);
+      return;
+    }
+    if (direction === "lower") {
+      maxBoundary = currentGuess;
+    } else {
+      minBoundary = currentGuess + 1;
+    }
+    const newRunNumber = generateRandomBetween(
+      minBoundary,
+      maxBoundary,
+      currentGuess
+    );
+    setCurrentGuess(newRunNumber);
+  };
   return (
     <View style={styles.screen}>
       <Title titleStyle={styles.title}>Opponent's Guess</Title>
       <NumberContainer>{currentGuess}</NumberContainer>
       <View>
         <Text>High or Low</Text>
+        <View>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
+            -
+          </PrimaryButton>
+          <PrimaryButton onPress={nextGuessHandler.bind(this, "greater")}>
+            +
+          </PrimaryButton>
+        </View>
       </View>
     </View>
   );
