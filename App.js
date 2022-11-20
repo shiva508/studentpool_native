@@ -7,7 +7,6 @@ import GussNumber from "./components/GussNumber";
 export default function App() {
   return (
     <>
-      <StatusBar style="dark" />
       <GussNumber />
     </>
   );
