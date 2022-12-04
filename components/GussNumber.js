@@ -3,18 +3,52 @@ import StartGameScreen from "../screens/StartGameScreen";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import GameScreen from "../screens/GameScreen";
+import GameOverScreen from "../screens/GameOverScreen";
+import { useFonts } from "expo-font";
 import Colors from "../constants/Colors";
+import AppLoading from "expo-app-loading";
 
 const GussNumber = () => {
   const [userNumber, setUserNumber] = useState();
+  const [gameOver, setGameOver] = useState(true);
+  const [gusseRounds, setGusseRounds] = useState(0);
+  const [fontLoaded] = useFonts({
+    "open-sans": require("../assets/fonts/OpenSans-Regular.ttf"),
+    "open-sans-bold": require("../assets/fonts/OpenSans-Bold.ttf"),
+  });
+
+  if (!fontLoaded) {
+    return <AppLoading />;
+  }
 
   const pickedNumberHandler = (inputNumber) => {
     setUserNumber(inputNumber);
+    setGameOver(false);
+  };
+  const gameOverHandler = () => {
+    setGameOver(true);
+  };
+
+  const startNewGameHandler = () => {
+    setUserNumber(null);
+    setGusseRounds(0);
   };
   let screen = <StartGameScreen onValidInput={pickedNumberHandler} />;
   if (userNumber) {
-    screen = <GameScreen userNumber={userNumber} />;
+    screen = (
+      <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />
+    );
   }
+  if (gameOver && userNumber) {
+    screen = (
+      <GameOverScreen
+        roundsNumber={gusseRounds}
+        userNumber={userNumber}
+        onStartNewGame={startNewGameHandler}
+      />
+    );
+  }
+
   return (
     <LinearGradient
       colors={[Colors.primary700, Colors.accent500]}
